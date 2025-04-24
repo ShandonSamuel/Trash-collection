@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History - TrashScan 9000</title>
+
+  <!-- Library -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  
+  <!-- Garbage Theme Styling -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle, #2a2f2a, #1a1c1a);
+      font-family: 'Share Tech Mono', monospace;
+      color: #d0f0c0;
+      background-image: url('img2.jpg');
+      background-size: cover;
+      background-blend-mode: multiply;
+      overflow-x: hidden;
+    }
+
+    main {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      background-color: rgba(10, 10, 10, 0.6);
+      padding: 40px;
+      animation: fadeIn 1s ease-in-out;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem;
+      color: #9aff61;
+      text-shadow: 1px 1px 2px #000;
+      margin-bottom: 30px;
+      animation: popIn 0.8s ease-in-out;
+      text-align: center;
+    }
+
+    /* Gallery Style */
+    .history-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin-top: 30px;
+      padding: 10px;
+      overflow-y: auto;
+      max-height: 500px; /* Scrollable area */
+    }
+
+    .history-item {
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #00ff88;
+      color: #00ff88;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
+    .history-item:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.8);
+    }
+
+    .history-button {
+      background-color: #00ff88;
+      color: #1a1a1a;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      margin-top: 20px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .history-button:hover {
+      background-color: #1a1a1a;
+      color: #00ff88;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .history-item {
+        font-size: 1rem;
+        padding: 15px;
+      }
+
+      .history-button {
+        font-size: 1rem;
+        padding: 8px 16px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>🗑 TrashScan History</h1>
+
+    <div class="history-container" id="historyContainer">
+      <!-- Data from Firebase will be populated here -->
+    </div>
+
+    <button class="history-button" onclick="goBack()">Back to Scan</button>
+  </main>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4H-XQTjNukKmRD1t1iyBKnmlcBtI9rZo",
+      authDomain: "garb-308d3.firebaseapp.com",
+      databaseURL: "https://garb-308d3-default-rtdb.firebaseio.com",
+      projectId: "garb-308d3",
+      storageBucket: "garb-308d3.firebasestorage.app",
+      messagingSenderId: "341956461705",
+      appId: "1:341956461705:web:ad09bf9184dacbb38db258",
+      measurementId: "G-813YZG6X10"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Function to retrieve history data from Firebase
+    function fetchHistory() {
+      const historyContainer = document.getElementById('historyContainer');
+      database.ref('sanjay@clean').once('value').then(snapshot => {
+        const historyData = snapshot.val();
+
+        if (historyData) {
+          for (let key in historyData) {
+            const entry = historyData[key];
+
+            // Create a new history item
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+
+            // Insert the weight, reward, and date into the item
+            historyItem.innerHTML = `
+              <p><strong>Weight:</strong> ${entry.weight}g</p>
+              <p><strong>Reward:</strong> ₹${entry.reward}</p>
+              <p><strong>Date:</strong> ${entry.date}</p>
+            `;
+
+            // Append the history item to the container
+            historyContainer.appendChild(historyItem);
+          }
+        } else {
+          historyContainer.innerHTML = '<p style="color:red">⚠️ No history found.</p>';
+        }
+      }).catch(err => {
+        console.error('Error fetching history:', err);
+        document.getElementById('historyContainer').innerHTML = '<p style="color:red">⚠️ Error loading history data.</p>';
+      });
+    }
+
+    function goBack() {
+      window.location.href = 'scanner.html';  // Replace with the actual path to your main page
+    }
+
+    // Fetch history when the page loads
+    window.onload = fetchHistory;
+  </script>
+</body>
+</html>

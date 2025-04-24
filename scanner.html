@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrashScan 9000</title>
+
+  <!-- Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+  <!-- Garbage Theme Styling -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap');
+
+    /* Global Styling */
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle, #2a2f2a, #1a1c1a);
+      font-family: 'Share Tech Mono', monospace;
+      color: #d0f0c0;
+      background-image: url('img2.jpg');
+      background-size: cover;
+      background-blend-mode: multiply;
+      overflow: hidden;
+    }
+
+    /* Main Container */
+    main {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(3px);
+      background-color: rgba(10, 10, 10, 0.5);
+      padding: 40px;
+      animation: fadeIn 1s ease-in-out;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      color: #9aff61;
+      text-shadow: 1px 1px 2px #000;
+      margin-bottom: 30px;
+      animation: popIn 0.8s ease-in-out;
+      text-align: center;
+    }
+
+    /* QR Code Scanner Container */
+    #reader {
+      width: 100%;
+      max-width: 500px;
+      border: 4px dashed #51744e;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(100, 255, 100, 0.3);
+    }
+
+    /* Result Display */
+    #result {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #00ff88;
+      color: #00ff88;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Button Styling */
+    button {
+      background-color: #00ff88;
+      color: #1a1a1a;
+      padding: 10px 20px;
+      border-radius: 5px;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #33ffaa;
+    }
+
+    /* Responsive Styling */
+    @media screen and (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      #reader {
+        max-width: 90%;
+        width: 100%;
+      }
+
+      #result {
+        max-width: 90%;
+      }
+
+      button {
+        padding: 8px 16px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>🗑 TrashScan 9000</h1>
+    <div id="reader"></div>
+    <div id="result"></div>
+  </main>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB4H-XQTjNukKmRD1t1iyBKnmlcBtI9rZo",
+      authDomain: "garb-308d3.firebaseapp.com",
+      databaseURL: "https://garb-308d3-default-rtdb.firebaseio.com",
+      projectId: "garb-308d3",
+      storageBucket: "garb-308d3.firebasestorage.app",
+      messagingSenderId: "341956461705",
+      appId: "1:341956461705:web:ad09bf9184dacbb38db258",
+      measurementId: "G-813YZG6X10"
+    };
+  
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+  
+    const scanner = new Html5QrcodeScanner('reader', {
+      qrbox: { width: 250, height: 250 },
+      fps: 20,
+    });
+  
+    function success(result) {
+      const scannedCode = "Trash143"; // fixed value
+  
+      document.getElementById('result').innerHTML = `
+        <h2>✅ QR Scanned Successfully</h2>
+        <p>🎉 Reward will be announced soon!</p>
+      `;
+  
+      scanner.clear();
+      document.getElementById('reader').remove();
+  
+      // Firebase: validate and reward
+      database.ref("Trash").once("value").then(snapshot => {
+        if (snapshot.val() === scannedCode) {
+          return database.ref("weight").once("value");
+        } else {
+          throw new Error("Invalid trash QR");
+        }
+      }).then(snapshot => {
+        const weight = snapshot.val();
+        const reward = Math.floor(100 + (weight / 5) * 60); // 100 to 400 scale
+  
+        const date = new Date().toLocaleString(); // Current date and time
+  
+        // Store the data under 'sanjay@clean' key in Firebase
+        database.ref('sanjay@clean').push({
+          weight: weight,
+          reward: reward,
+          date: date
+        }).then(() => {
+          document.getElementById('result').innerHTML += `
+            <h3>🪙 Reward: ₹${reward}</h3>
+            <p>Weight scanned: ${weight}g</p>
+            <p>Date: ${date}</p>
+            <button onclick="goToHistory()">History</button>
+          `;
+        }).catch(err => {
+          document.getElementById('result').innerHTML += `
+            <p style="color:red">⚠️ Error saving data: ${err.message}</p>
+          `;
+        });
+  
+      }).catch(err => {
+        document.getElementById('result').innerHTML += `
+          <p style="color:red">⚠️ ${err.message}</p>
+        `;
+      });
+    }
+  
+    function error(err) {
+      console.warn("Scanning error", err);
+    }
+  
+    function goToHistory() {
+      // Redirect to the history page
+      window.location.href = "history.html"; // Replace 'history.html' with the actual URL or path to your history page
+    }
+  
+    scanner.render(success, error);
+  </script>
+</body>
+</html>

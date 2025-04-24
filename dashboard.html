@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CleanTown Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* General Styles */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0e1f0e;
+      color: #c8ffc8;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: #1f331f;
+      color: #aaffaa;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #44ff44;
+      box-shadow: 0 2px 15px #00ff8899;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2rem;
+      animation: neonGlow 2s infinite alternate;
+    }
+
+    @keyframes neonGlow {
+      from { text-shadow: 0 0 5px #44ff44; }
+      to { text-shadow: 0 0 20px #44ff44; }
+    }
+
+    .login-btn {
+      background-color: #00ff88;
+      border: none;
+      padding: 10px 20px;
+      color: #003300;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px #00ff88;
+    }
+
+    .login-btn:hover {
+      background-color: #33ffaa;
+      box-shadow: 0 0 20px #00ff88;
+    }
+
+    /* Container and Flexbox Styles */
+    .container {
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+      padding: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .card {
+      background: #193219;
+      border: 2px solid #00ff88;
+      border-radius: 15px;
+      padding: 20px;
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+      box-shadow: 0 0 15px #00ff88aa;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      color: #d0ffd0;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #44ff44;
+      text-align: center;
+    }
+
+    th {
+      background-color: #255a25;
+    }
+
+    /* Responsive Styles for Mobile and Tablets */
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+
+      .container {
+        gap: 20px;
+        padding: 10px;
+      }
+
+      .card {
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-width: 100%;
+      }
+
+      table {
+        font-size: 0.9rem;
+      }
+
+      .login-btn {
+        padding: 8px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        gap: 15px;
+        padding: 5px;
+      }
+
+      .card {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+
+      table {
+        font-size: 0.8rem;
+      }
+
+      .login-btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1>CleanTown Dashboard</h1>
+    <button onclick="next()" class="login-btn">Login</button>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Garbage Prices by Weight</h2>
+      <table>
+        <tr><th>Weight (kg)</th><th>Price (₹)</th></tr>
+        <tr><td>1</td><td>100</td></tr>
+        <tr><td>2</td><td>180</td></tr>
+        <tr><td>3</td><td>250</td></tr>
+        <tr><td>4</td><td>320</td></tr>
+        <tr><td>5</td><td>400</td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Bar Graph - Waste Collected</h2>
+      <canvas id="barChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Line Graph - Waste Over Time</h2>
+      <canvas id="lineChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Radar Graph - Area Comparison</h2>
+      <canvas id="radarChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const barCtx = document.getElementById('barChart');
+    const lineCtx = document.getElementById('lineChart');
+    const radarCtx = document.getElementById('radarChart');
+
+    function next() {
+      window.location.href = "login.html";
+    }
+
+    new Chart(barCtx, {
+      type: 'bar',
+      data: {
+        labels: ['Zone A', 'Zone B', 'Zone C', 'Zone D'],
+        datasets: [{
+          label: 'KG Collected',
+          data: [12, 19, 3, 17],
+          backgroundColor: '#00ff88'
+        }]
+      }
+    });
+
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        datasets: [{
+          label: 'Monthly Waste (kg)',
+          data: [100, 80, 60, 40, 30],
+          borderColor: '#00ff88',
+          fill: false
+        }]
+      }
+    });
+
+    new Chart(radarCtx, {
+      type: 'radar',
+      data: {
+        labels: ['North', 'South', 'East', 'West'],
+        datasets: [{
+          label: 'Reduction Level',
+          data: [65, 59, 90, 81],
+          backgroundColor: 'rgba(0, 255, 136, 0.2)',
+          borderColor: '#00ff88'
+        }]
+      }
+    });
+  </script>
+</body>
+</html>
